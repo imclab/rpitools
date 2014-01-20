@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# rpitools:cron:*/5 * * * * /usr/local/bin/rpi_keep_wlan0
+
+
+CONTENT=$(curl --silent --connect-timeout 5  https://raw.github.com/christophemaillot/rpitools/master/probe.txt)
+
+if [ "$CONTENT" == "1.0" ];
+then
+    exit 0
+fi
+
+ifdown wlan0
+sleep 5
+ifup wlan0
