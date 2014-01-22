@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# rpitools 0.1.0 - rpi command line toolbox
+#
+# see README.md for more info
+#
+#
+
+function rpitools_cmd_selfupdate {
+	echo "self updating"
+}
+
+function rpitools_cmd_install_script {
+	SCRIPT=$1
+
+	if [ "$SCRIPT" == "" ];
+	then
+		echo "Please specify a script name"
+		exit -1
+	fi
+
+	#curl --silent https://raw.github.com/christophemaillot/rpitools/master/scripts/$SCRIPT  > /tmp/rpitools_scripts
+
+	LINE=$(cat /tmp/rpitools_scripts |  head -n 3 | tail -n 1)
+	LINE=$(echo "$LINE" | sed -e "s/^.*rpitools://")
+
+	TYPE=$(echo "$LINE" | cut -f 1 -d ':' )
+	ARGS=$(echo "$LINE" | cut -f 2 -d ':' )
+
+	if [ "$TYPE" == "cron" ];
+	then
+		echo "$ARGS" > /etc/cron.d/$SCRIPT
+		chmod +x /etc/cron.d/$SCRIPT
+	fi
+	
+	cp /tmp/rpitools_scripts /usr/local/bin/$SCRIPT
+	chmod +x /usr/local/bin/$SCRIPT
+
+	echo "Script $SCRIPT successfully installed."
+}
+
+########################################################################
+##        main routine                                                ##
+########################################################################
+
+if [ $(whoami) != "root" ];
+then
+	echo "ERROR : This script must be run as root"
+	exit -1
+fi
+
+CMD=$1
+FUN="rpitools_cmd_$CMD"
+
+declare -f $FUN > /dev/null;
+
+if [ "$?" == "0" ];
+then
+	shift;
+	$FUN $@
+else
+	echo "ERROR : unknown command $CMD"
+fi
+
