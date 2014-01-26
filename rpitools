@@ -19,7 +19,7 @@ function rpitools_cmd_install_script {
 		exit -1
 	fi
 
-	#curl --silent https://raw.github.com/christophemaillot/rpitools/master/scripts/$SCRIPT  > /tmp/rpitools_scripts
+	curl --silent https://raw.github.com/christophemaillot/rpitools/master/scripts/$SCRIPT  > /tmp/rpitools_scripts
 
 	LINE=$(cat /tmp/rpitools_scripts |  head -n 3 | tail -n 1)
 	LINE=$(echo "$LINE" | sed -e "s/^.*rpitools://")
